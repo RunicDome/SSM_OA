@@ -1,0 +1,130 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/main.css">
+    <link rel="stylesheet" type="text/css" href="../../../bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../bootstrap/css/bootstrap-table.css">
+    <script type="text/javascript" src="../../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../js/colResizable-1.3.min.js"></script>
+    <!--    <script type="text/javascript" src="../../../js/common.js"></script>-->
+    <script type="text/javascript" src="../../../bootstrap/js/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="../../../bootstrap/js/bootstrap.js"></script>
+    <script type="text/javascript" src="../../../bootstrap/js/bootstrap-table.js"></script>
+    <script type="text/javascript" src="../../../bootstrap/js/bootstrap-table-zh-CN.js"></script>
+</head>
+<script type="text/javascript">
+    $(function () {
+        var urlParams = new URLSearchParams(window.location.search);
+        var taskid = urlParams.get('taskid');
+        var state = urlParams.get('state');
+        var lauchtime = urlParams.get('lauchtime');
+        $.getJSON("/cachet/getCachetByTaskId", {taskid: taskid}, function (data) {
+            if (state == "0") {
+                $("#state").html("待审核");
+                $("#time").html("无");
+            } else if (state == "1") {
+                $("#state").html("审核通过");
+                $("#time").html(lauchtime);
+            } else if (state == "-1") {
+                $("#state").html("驳回");
+                $("#time").html(lauchtime);
+            }
+            $("#name").html(data.user.loginname);
+            $("#dept").html(data.dept.name);
+            $("#usetime").html(formattedDateTime(data.usetime));
+            $("#lauchtime").html(formattedDateTime(data.lauchtime));
+            $("#type").html(data.cachetType.name);
+            $("#admin").html(data.admin.loginname);
+            $("#remark").html(data.remark);
+
+
+        });
+    })
+    function formattedDateTime(date) {
+        var date = new Date(date);
+        var day = date.getDate();
+        var month = date.getMonth() + 1; // 月份从0开始，需要加1
+        var year = date.getFullYear();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+
+        // 格式化日期、月份、小时、分钟和秒，确保它们以两位数表示
+        var formattedDate = year + '-' + (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
+        var formattedTime = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+
+        // 最终的格式化日期时间字符串
+        var formattedDateTime = formattedDate + ' ' + formattedTime;
+        return formattedDateTime;
+    }
+</script>
+
+<body>
+<div id="forms" class="mt10">
+    <div class="box">
+        <div class="box_border">
+            <div class="box_top"><b class="pl15">任务明细</b></div>
+            <div class="box_center">
+                <form action="list.html" class="jqtransform">
+                    <table class="form_table pt15 pb15" width="100%" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="td_right">姓名：</td>
+                            <td id="name"></td>
+                        </tr>
+                        <tr>
+                        <tr>
+                            <td class="td_right">部门：</td>
+                            <td id="dept">
+                                研发部
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="td_right">开始时间：</td>
+                            <td id="usetime"></td>
+                        </tr>
+                        <tr>
+                            <td class="td_right">结束时间：</td>
+                            <td id="lauchtime"></td>
+                        </tr>
+                        <tr>
+                            <td class="td_right">用章类型：</td>
+                            <td id="type"></td>
+                        </tr>
+                        <tr>
+                            <td class="td_right">备注：</td>
+                            <td id="remark"></td>
+                        </tr>
+
+                        <tr>
+                            <td class="td_right">审批人：</td>
+                            <td id="admin"></td>
+                        </tr>
+                        <tr>
+                            <td class="td_right">审核意见：</td>
+                            <td id="state"></td>
+                        </tr>
+                        <tr>
+                            <td class="td_right">审批时间：</td>
+                            <td id="time"></td>
+                        </tr>
+
+
+                        <td class="td_right">&nbsp;</td>
+                        <td class="">
+
+                            <input type="button" name="button" class="btn btn82 btn_res"
+                                   onclick="location.href='javascript:history.go(-1)'" value="返回">
+                        </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+
+</html>

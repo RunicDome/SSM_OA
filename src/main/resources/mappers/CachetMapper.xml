@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ssm.mapper.CachetMapper">
+    <insert id="addCachet" parameterType="com.example.ssm.entity.Cachet" useGeneratedKeys="true" keyProperty="id">
+         insert into cachet (userid, deptid, adminid, typeid, usetime, lauchtime, remark, state, isdelete)
+         values (#{userid}, #{deptid}, #{adminid}, #{typeid}, #{usetime}, #{lauchtime}, #{remark}, 0,1)
+    </insert>
+    <select id="selectUserIdByName" resultType="java.lang.Integer">
+        select id from user where loginname=#{value}
+    </select>
+    <select id="selectCachetIdByName" resultType="java.lang.Integer">
+        select id from cachet_type where name=#{value}
+    </select>
+    <select id="selectdeptIdByName" resultType="java.lang.Integer">
+        select id from dept where name=#{value}
+    </select>
+    <select id="selectRoleIdByName" resultType="java.lang.Integer">
+        select id from role where name=#{value}
+    </select>
+    <select id="selectCachetTypeList" resultType="com.example.ssm.entity.CachetType">
+        select id,name from cachet_type
+    </select>
+    <select id="selectAdminList" resultType="com.example.ssm.entity.User">
+        select id,loginname from user where roleid &lt;= #{value}
+    </select>
+    <resultMap id="CachetMap" type="com.example.ssm.entity.Cachet" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="user"  javaType="com.example.ssm.entity.User">
+            <id property="id" column="id"/>
+            <result property="loginname" column="user_loginname"/>
+        </association>
+        <association property="dept"  javaType="com.example.ssm.entity.Dept">
+            <id property="id" column="id"/>
+            <result property="name" column="dept_name"/>
+        </association>
+        <association property="admin"  javaType="com.example.ssm.entity.User">
+            <id property="id" column="id"/>
+            <result property="loginname" column="role_name"/>
+        </association>
+        <association property="cachetType"  javaType="com.example.ssm.entity.CachetType">
+            <id property="id" column="id"/>
+            <result property="name" column="cachet_type_name"/>
+        </association>
+    </resultMap>
+    <select id="selectCachetByTaskid" resultMap="CachetMap">
+        select user1.loginname as user_loginname,
+               dept.name as dept_name,
+                user2.loginname as role_name,
+                cachet_type.name as cachet_type_name,
+                cachet.usetime,cachet.lauchtime,cachet.remark
+            from cachet
+        inner join user as user1 on cachet.userid=user1.id
+        inner join dept on cachet.deptid=dept.id
+        inner join user as user2 on cachet.adminid=user2.id
+        inner join cachet_type on cachet.typeid=cachet_type.id
+        where cachet.id=#{value}
+    </select>
+</mapper>
