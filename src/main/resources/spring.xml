@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/context
+https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--扫描注解包-->
+    <context:component-scan base-package="com.example.ssm"/>
+    <!--读取jdbc.properties-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--配置连接池  Connection -->
+    <bean  id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.pwd}"></property>
+        <property name="initialSize" value="3"/>
+        <property name="maxActive" value="8"/>
+    </bean>
+    <!-- 注解 spring声明式事务 ： 以方法为单位进行事务提交，回滚 ，AOP，Service层-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--开启基于注解驱动的事务扫描-->
+    <tx:annotation-driven transaction-manager="txManager"/>
+    <!--配置mybatis的factory-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+            <!--数据库连接池-->
+            <property name="dataSource" ref="dataSource"/>
+            <!--实体类别名-->
+            <property name="typeAliasesPackage" value="com.example.ssm.entity"/>
+            <!--映射文件-->
+            <property name="mapperLocations" value="classpath:mappers/*.xml"/>
+    </bean>
+    <!--扫描接口包，创建mapper接口的代理-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <property name="basePackage" value="com.example.ssm.mapper"/>
+    </bean>
+</beans>

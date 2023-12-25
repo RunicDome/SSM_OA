@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ssm.mapper.TaskMapper">
+    <!--    &lt;!&ndash; id : 需要和接口的方法名一致 ，如果是注解传递参数，无需写参数类型&ndash;&gt;-->
+    <!--    <select id="queryRoleList" resultType="Role">-->
+    <!--    select *  from role-->
+    <!--    <where>-->
+    <!--        <if test="role.rid != null and role.rid!='' ">-->
+    <!--            and rid = #{role.rid}-->
+    <!--        </if>-->
+    <!--        <if test="role.roleName != null and role.roleName != ''">-->
+    <!--            and roleName like  concat('%' , #{role.roleName} , '%')-->
+    <!--        </if>-->
+    <!--    </where>-->
+    <!--    limit  #{start} , #{pageSize}-->
+    <!--    </select>-->
+    <!--    <select id="queryRoleCount" resultType="int" parameterType="Role">-->
+    <!--    select count(*)  from role-->
+    <!--    <where>-->
+    <!--        <if test="rid != null and rid!='' ">-->
+    <!--            and rid = #{rid}-->
+    <!--        </if>-->
+    <!--        <if test="roleName != null and roleName != ''">-->
+    <!--            and roleName like  concat('%' , #{roleName} , '%')-->
+    <!--        </if>-->
+    <!--    </where>-->
+    <!--    </select>-->
+
+    <resultMap id="taskList" type="Task" autoMapping="true">
+        <id property="id" column="id"/>
+        <result property="name" column="task_name"/>
+        <association property="taskType"  javaType="TaskType">
+            <id property="id" column="id"/>
+            <result property="name" column="task_type_name"/>
+        </association>
+        <association property="user"  javaType="User">
+            <id property="id" column="id"/>
+            <result property="loginname" column="user_loginname"/>
+        </association>
+        <association property="role"  javaType="Role">
+            <id property="id" column="id"/>
+            <result property="name" column="role_name"/>
+        </association>
+    </resultMap>
+    <select id="queryTaskList" resultMap="taskList">
+        select task.name as task_name,
+               task_type.name as task_type_name,
+               user.loginname as user_loginname,
+               role.name as role_name,
+               task.lauchtime,task.subtime,task.taskid,task.state
+        from task
+                 inner join task_type on task.typeid = task_type.id
+                 inner join user on task.userid = user.id
+                 inner join role on task.adminid = role.id
+        <where>
+            task.isdelete = 1
+            <if test="task.state != null and task.state != 2">
+                and task.state = #{task.state}
+            </if>
+            <if test="task.taskType != null and task.taskType.name!= null and task.taskType.name != '' ">
+                and task_type.name = #{task.taskType.name}
+            </if>
+            <if test="task.lauchtime != null">
+            and task.lauchtime &gt;= #{task.lauchtime}
+            </if>
+            <if test="task.subtime != null">
+            and task.lauchtime &lt;= #{task.subtime}
+            </if>
+        </where>
+        limit #{start},#{pageSize}
+    </select>
+    <select id="queryTaskCount" resultType="java.lang.Integer" parameterType="Task">
+        select count(*) from task
+            inner join task_type on task.typeid = task_type.id
+            inner join user on task.userid = user.id
+            inner join role on task.adminid = role.id
+        <where>
+            task.isdelete = 1
+            <if test="state != null and state != 2">
+                and task.state = #{state}
+            </if>
+            <if test="taskType != null and taskType.name!= null and taskType.name != '' ">
+                and task_type.name = #{taskType.name}
+            </if>
+            <if test="lauchtime != null">
+                and task.lauchtime &gt;= #{lauchtime}
+            </if>
+            <if test="subtime != null">
+                and task.lauchtime &lt;= #{subtime}
+            </if>
+        </where>
+    </select>
+</mapper>
