@@ -1,131 +1,254 @@
 ﻿<!doctype html>
- <html lang="zh-CN">
- <head>
-   <meta charset="UTF-8">
-   <link rel="stylesheet" href="../../../css/common.css">
-   <link rel="stylesheet" href="../../../css/main.css">
-   <script type="text/javascript" src="../../../js/jquery.min.js"></script>
-   <script type="text/javascript" src="../../../js/colResizable-1.3.min.js"></script>
-   <script type="text/javascript" src="../../../js/common.js"></script>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/main.css">
+    <link rel="stylesheet" type="text/css" href="../../../bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../bootstrap/css/bootstrap-table.css">
+    <script type="text/javascript" src="../../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../js/colResizable-1.3.min.js"></script>
+    <!--    <script type="text/javascript" src="../../../js/common.js"></script>-->
+    <script type="text/javascript" src="../../../bootstrap/js/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="../../../bootstrap/js/bootstrap.js"></script>
+    <script type="text/javascript" src="../../../bootstrap/js/bootstrap-table.js"></script>
+    <script type="text/javascript" src="../../../bootstrap/js/bootstrap-table-zh-CN.js"></script>
 
-  <script type="text/javascript">
-    function del(){
-	  confirm("确认删除");
-	}
-	function delall(){
-	  confirm("确认删除");
-	}
-	function excel(){
-	  confirm("确认导出");
-	}
-  </script>
+    <script type="text/javascript">
+        $(function () {
+            loadPage()
+            // initButton()
+        })
+        function loadPage() {
+            $('#mytab').bootstrapTable({
+                url: "/announce/list",
+                method: "get",
+                dataType: "json",
+                contentType: "application/x-www-form-urlencoded",
+                toolbar: "#toolbar",
+                striped: true,//隔行变色
+                cache: false,  //是否使用缓存
+                sidePagination: "server", //服务端处理分页
+                pageNumber: "1",//第几页
+                pageSize: "5",//一页几条
+                pageList: [5, 10, 25, 50],
+                undefinedText: '--',
+                uniqueId: "sn", //每一行的唯一标识，一般为主键列
+                queryParamsType: '',
+                queryParams: queryParams,//传递参数（*）
+                columns: [
+                    {
+                        title: '全选',
+                        // field:'rid',
+                        //复选框
+                        checkbox: true,
+                        width: 50,
+                        align: 'center',
+                        valign: 'middle'
+                    },
+                    {
+                        title: '编号',
+                        field: 'id',
+                        visible: true
+                    },
+                    {
+                        title: '名称',
+                        field: 'title',
+                        // sortable:true
+                    },
+                    {
+                        field: 'userid',
+                        title: '发布人',
+                        formatter: function (value, row, index) {
+                            return formattedDateTime(value);
+                        }
+                    },
+                    {
+                        title: '状态',
+                        field: 'state',
+                    },
+                    {
+                        title: '发布时间',
+                        field: 'lauchtime',
+                        formatter: function (value, row, index) {
+                            if (row.state == "0") {
+                                return " ";
+                            }
+                            return formattedDateTime(value);
+                        }
+                    },
+                    {
+                        title: '状态',
+                        field: 'state',
+                        formatter: function (value, row, index) {
+                            if (value == "0") {
+                                return "待审核";
+                            } else if (value == "1") {
+                                return "审核通过";
+                            } else if (value == "-1") {
+                                return "驳回";
+                            }
+                        }
+                    },
+                    {
+                        title: '操作',
+                        field: 'id',
+                        align: 'center',
+                        width: 200,
+                        formatter: function (value, row, index) {
+                            if (row.state == "0") {
+                                const a = '<button href="#" class="btn btn-default"  onclick="pass(\'' + row.id + '\')">发布</button> ';
+                                const b = '<button href="#" class="btn btn-default"  onclick="reject(\'' + row.id + '\')">编辑</button> ';
+                                const c = '<button href="#" class="btn btn-default"  onclick="del(\'' + row.id + '\')">删除</button> ';
+
+                                return a + b + c;
+                            }
+                            // return '<button href="#" class="btn btn-default"  onclick="look(\''+row.taskid+'\',\''+row.typeid+'\')">查看</button> ';
+                            return '<button href="#" class="btn btn-default"  onclick="del(\'' + row.id + '\')">删除</button> ';
+                        }
+                    }
+                ],
+                pagination: true,
+                locale: 'zh-CN'//中文支持,
+            });
+        }
+
+        function queryParams(params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+            };
+            // if ($("#testid").val()) temp.taskid = $("#testid").val();
+            // if ($("#name").val()) temp.name = $("#name").val();
+            // if ($("#lauchtime").val()) temp.lauchtime = formattedDateTime($("#lauchtime").val());
+            // if ($("#subtime").val()) temp.subtime = formattedDateTime($("#subtime").val());
+            // if ($("#taskType_name").val() && $("#taskType_name").val() != "请选择") temp.taskTypeName = $("#taskType_name").val();
+            // // if($("#taskType_name").val()) temp.taskType = $("#taskType_name").val();
+            // if ($("#state").val()) temp.state = $("#state").val();
+            return temp;
+        }
+
+        function del() {
+            confirm("确认删除");
+        }
+
+        function delall() {
+            confirm("确认删除");
+        }
+
+        function excel() {
+            confirm("确认导出");
+        }
+    </script>
 </head>
 <body>
 <form action="list.html" method="post">
-     <div id="search_bar" class="mt10">
-       <div class="box">
-          <div class="box_border">
-            <div class="box_top"><b class="pl15">通告列表</b></div>
-            <div class="box_center pt10 pb10">
-              <table class="form_table" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td>名称</td>
-                  <td><input type="text" name="name" class="input-text lh25" size="10"></td>                
-                 
-                  <td>发布时间</td>
-                  <td><input type="text" name="name" class="input-text lh25" size="10">to
-				  <input type="text" name="name" class="input-text lh25" size="10"></td>
-                   <td><input type="button" name="button" class="btn btn82 btn_search" value="查询">
-			    <input type="button" name="button" class="btn btn82 btn_recycle" value="清空"></td>
-                </tr>
-               
-              </table>
+    <div id="search_bar" class="mt10">
+        <div class="box">
+            <div class="box_border">
+                <div class="box_top"><b class="pl15">通告列表</b></div>
+                <div class="box_center pt10 pb10">
+                    <table class="form_table" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td>名称</td>
+                            <td><input type="text" name="name" class="input-text lh25" size="10"></td>
+
+                            <td>发布时间</td>
+                            <td><input type="text" name="name" class="input-text lh25" size="10">to
+                                <input type="text" name="name" class="input-text lh25" size="10"></td>
+                            <td><input type="button" name="button" class="btn btn82 btn_search" value="查询">
+                                <input type="button" name="button" class="btn btn82 btn_recycle" value="清空"></td>
+                        </tr>
+
+                    </table>
+                </div>
+
+                <div class="box_bottom pb5 pt5 pr10" style="border-top:1px solid #dadada;">
+                    <div class="search_bar_btn" style="text-align:center;">
+
+                        <a href="add.html" class="ext_btn"><span class="add"></span>添加通告</a>
+                    </div>
+                </div>
             </div>
-        
-             <div  class="box_bottom pb5 pt5 pr10" style="border-top:1px solid #dadada;">
-              <div class="search_bar_btn" style="text-align:center;" >
-                 
-                 <a href="add.html" class="ext_btn"><span class="add"></span>添加通告</a>
-              </div>
-            </div>
-			</div>  </div>
-			</form>
-
- <div id="table" class="mt10">
-        <div class="box span10 oh">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" class="list_table">
-                <tr>
-				   <th> <input type="checkbox"></th>
-                   <th >名称</th>
-                   <th >发布人</th>
-                   <th >状态</th>
-                   <th>发布时间</th>
-				   <th>操作</th>
-                    </tr>
-                <tr class="tr" align="center">
-                   <td class="td_center"><input type="checkbox"></td>
-                   <td><a href="look.html">最新公告</a></td>
-                   <td>张三</td>
-                   <td>已发布</td>
-				   <td>2015-11-28 11:25:20</td>
-				   <td>
-					  <a href="javascript:void(0)" onclick="del()">删除</a> 
-				   </td>
-                 </tr>
-				  <tr class="tr" align="center">
-                   <td class="td_center"><input type="checkbox"></td>
-                   <td><a href="look.html">关于请假事项</a></td>
-                   <td>李四</td>
-                   <td>草稿</td>
-				   <td>无</td>
-				   <td>
-				      <a href="#">发布</a> |&nbsp;
-					  <a href="edit.html">编辑</a> |&nbsp;
-					  <a href="javascript:void(0)" onclick="del()">删除</a> 
-				   </td>
-                 </tr>
-				  <tr class="tr" align="center">
-                   <td class="td_center"><input type="checkbox"></td>
-                   <td><a href="look.html">关于人事管理事项</a></td>
-                   <td>王武</td>
-                   <td>已过期</td>
-				   <td>2012-12-10 10:15:00</td>
-				   <td>
-					  <a href="javascript:void(0)" onclick="del()">删除</a> 
-				   </td>
-                 </tr>
-
-
-
-                
-               <tr>
-			   <td colspan="2"><input type="button" name="button" class="btn btn82 btn_del" value="删除" onclick="delall()">
-			    <input type="button" name="button"  class="btn btn82 btn_export" value="导出" onclick="excel()">
-				</td>
-				<td colspan="5" align="right">
-				     <div class="page mt10">
-						<div class="pagination">
-						  <ul >
-							  <li class="first-child"><a href="#">首页</a></li>
-							  <li class=""><span>上一页</span></li>
-							  <li class="active"><span>1</span></li>
-							  <li><a href="#">2</a></li>
-							  <li><a href="#">3</a></li>
-							  <li><a href="#">4</a></li>
-							  <li><a href="#">下一页</a></li>
-							  <li ><a href="#">末页</a></li>
-							   <li ><span>共3条数据</span></li>
-					     <li ><span>共5页</span></li>
-						  </ul>
-						</div>
-                     </div>
-				</td>
-			   </tr>
-              </table>			  
-		
-             
         </div>
-     </div>
+    </div>
+</form>
+<table id="mytab" class="table table-striped table-bordered table-hover"></table>
+
+<!--<div id="table" class="mt10">-->
+<!--    <div class="box span10 oh">-->
+<!--        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="list_table">-->
+<!--            <tr>-->
+<!--                <th><input type="checkbox"></th>-->
+<!--                <th>名称</th>-->
+<!--                <th>发布人</th>-->
+<!--                <th>状态</th>-->
+<!--                <th>发布时间</th>-->
+<!--                <th>操作</th>-->
+<!--            </tr>-->
+<!--            <tr class="tr" align="center">-->
+<!--                <td class="td_center"><input type="checkbox"></td>-->
+<!--                <td><a href="look.html">最新公告</a></td>-->
+<!--                <td>张三</td>-->
+<!--                <td>已发布</td>-->
+<!--                <td>2015-11-28 11:25:20</td>-->
+<!--                <td>-->
+<!--                    <a href="javascript:void(0)" onclick="del()">删除</a>-->
+<!--                </td>-->
+<!--            </tr>-->
+<!--            <tr class="tr" align="center">-->
+<!--                <td class="td_center"><input type="checkbox"></td>-->
+<!--                <td><a href="look.html">关于请假事项</a></td>-->
+<!--                <td>李四</td>-->
+<!--                <td>草稿</td>-->
+<!--                <td>无</td>-->
+<!--                <td>-->
+<!--                    <a href="#">发布</a> |&nbsp;-->
+<!--                    <a href="edit.html">编辑</a> |&nbsp;-->
+<!--                    <a href="javascript:void(0)" onclick="del()">删除</a>-->
+<!--                </td>-->
+<!--            </tr>-->
+<!--            <tr class="tr" align="center">-->
+<!--                <td class="td_center"><input type="checkbox"></td>-->
+<!--                <td><a href="look.html">关于人事管理事项</a></td>-->
+<!--                <td>王武</td>-->
+<!--                <td>已过期</td>-->
+<!--                <td>2012-12-10 10:15:00</td>-->
+<!--                <td>-->
+<!--                    <a href="javascript:void(0)" onclick="del()">删除</a>-->
+<!--                </td>-->
+<!--            </tr>-->
+
+
+<!--            <tr>-->
+<!--                <td colspan="2"><input type="button" name="button" class="btn btn82 btn_del" value="删除"-->
+<!--                                       onclick="delall()">-->
+<!--                    <input type="button" name="button" class="btn btn82 btn_export" value="导出" onclick="excel()">-->
+<!--                </td>-->
+<!--                <td colspan="5" align="right">-->
+<!--                    <div class="page mt10">-->
+<!--                        <div class="pagination">-->
+<!--                            <ul>-->
+<!--                                <li class="first-child"><a href="#">首页</a></li>-->
+<!--                                <li class=""><span>上一页</span></li>-->
+<!--                                <li class="active"><span>1</span></li>-->
+<!--                                <li><a href="#">2</a></li>-->
+<!--                                <li><a href="#">3</a></li>-->
+<!--                                <li><a href="#">4</a></li>-->
+<!--                                <li><a href="#">下一页</a></li>-->
+<!--                                <li><a href="#">末页</a></li>-->
+<!--                                <li><span>共3条数据</span></li>-->
+<!--                                <li><span>共5页</span></li>-->
+<!--                            </ul>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </td>-->
+<!--            </tr>-->
+<!--        </table>-->
+
+
+<!--    </div>-->
+<!--</div>-->
 
 </body>
 </html>
