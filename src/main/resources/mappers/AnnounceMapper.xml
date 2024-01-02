@@ -69,4 +69,10 @@
 <!--            </if>-->
 <!--        </where>-->
     </select>
+    <select id="queryUserNameById" resultType="java.lang.String" parameterType="int">
+        select
+            loginname
+        from user
+        where id = #{value}
+    </select>
 </mapper>

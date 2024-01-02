@@ -20,4 +20,9 @@ public class AnnounceServiceImpl implements AnnounceService {
     public int queryAnnounceCount(Announce announce) {
         return announceMapper.queryAnnounceCount(announce);
     }
+
+    @Override
+    public String queryUserNameById(int id) {
+        return announceMapper.queryUserNameById(id);
+    }
 }

@@ -57,22 +57,15 @@
                         // sortable:true
                     },
                     {
-                        field: 'userid',
+                        field: 'user.loginname',
                         title: '发布人',
-                        formatter: function (value, row, index) {
-                            return formattedDateTime(value);
-                        }
-                    },
-                    {
-                        title: '状态',
-                        field: 'state',
                     },
                     {
                         title: '发布时间',
-                        field: 'lauchtime',
+                        field: 'subtime',
                         formatter: function (value, row, index) {
-                            if (row.state == "0") {
-                                return " ";
+                            if(row.state==0){
+                                return "未发布";
                             }
                             return formattedDateTime(value);
                         }
@@ -138,6 +131,23 @@
 
         function excel() {
             confirm("确认导出");
+        }
+        function formattedDateTime(date) {
+            var date = new Date(date);
+            var day = date.getDate();
+            var month = date.getMonth() + 1; // 月份从0开始，需要加1
+            var year = date.getFullYear();
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var seconds = date.getSeconds();
+
+            // 格式化日期、月份、小时、分钟和秒，确保它们以两位数表示
+            var formattedDate = year + '-' + (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
+            var formattedTime = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+
+            // 最终的格式化日期时间字符串
+            var formattedDateTime = formattedDate + ' ' + formattedTime;
+            return formattedDateTime;
         }
     </script>
 </head>

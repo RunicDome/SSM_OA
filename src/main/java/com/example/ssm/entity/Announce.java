@@ -9,10 +9,18 @@ public class Announce {
   private java.sql.Timestamp starttime;
   private java.sql.Timestamp endtime;
   private java.sql.Timestamp subtime;
-  private long userid;
+  private int userid;
   private long isdelete;
   private long state;
+  private User user;
 
+  public User getUser() {
+    return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
 
   public long getId() {
     return id;
@@ -68,11 +76,11 @@ public class Announce {
   }
 
 
-  public long getUserid() {
+  public int getUserid() {
     return userid;
   }
 
-  public void setUserid(long userid) {
+  public void setUserid(int userid) {
     this.userid = userid;
   }
 
